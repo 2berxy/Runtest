@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUN TRACKING</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Cyberpunk Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Orbitron & Prompt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Prompt', sans-serif; }
+        .font-neon { font-family: 'Orbitron', sans-serif; }
+        .dark .glow-cyan { text-shadow: 0 0 10px rgba(6, 182, 212, 0.7), 0 0 20px rgba(6, 182, 212, 0.4); }
+        .dark .glow-blue { text-shadow: 0 0 10px rgba(59, 130, 246, 0.7), 0 0 20px rgba(59, 130, 246, 0.4); }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        ::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(59, 130, 246, 0.8); }
+    </style>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyberdark: '#0a0b10',
+                        cybercard: '#121420',
+                        cyberlight: '#f8fafc',
+                        neoncyan: '#06b6d4',
+                        blue500: '#3b82f6',
+                        neonyellow: '#eab308'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-cyberlight dark:bg-cyberdark text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-300">
+
+    <!-- ================= AUTH ZONE (LOGIN/REGISTER LAYER) ================= -->
+    <div id="auth-container" class="min-h-screen flex items-center justify-center p-6 relative">
+        <div class="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 to-pink-500/10 pointer-events-none"></div>
+        
+        <div class="bg-white dark:bg-cybercard w-full max-w-md p-8 rounded-2xl border border-slate-200 dark:border-cyan-500/30 shadow-2xl relative z-10">
+            <div class="text-center mb-8">
+                <span class="font-neon font-black text-3xl tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-neoncyan to-blue500 glow-cyan">RUN TRACKING</span>
+                <p class="text-xs text-slate-500 dark:text-cyan-400/70 mt-2 font-neon">WELCOME</p>
+            </div>
+
+            <!-- Login Box Form -->
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                <h3 class="text-lg font-bold text-slate-700 dark:text-white"><i class="fa-solid fa-lock text-neoncyan mr-2"></i>เข้าสู่ระบบ</h3>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">อีเมลผู้ใช้งาน</label>
+                    <input type="email" id="login-email" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-neoncyan dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">รหัสผ่าน</label>
+                    <input type="password" id="login-password" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-neoncyan dark:text-white">
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-neoncyan to-blue-500 text-white font-bold py-3 rounded-xl hover:brightness-112 shadow-lg transition-all">ACCESS SYSTEM</button>
+                <p class="text-xs text-center text-slate-500">ยังไม่มีบัญชีในระบบ? <a href="#" onclick="switchAuthMode('reg')" class="text-blue-500 font-bold hover:underline">ลงทะเบียนที่นี่</a></p>
+            </form>
+
+            <!-- Register Box Form (Hidden Default) -->
+            <form id="register-form" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+                <h3 class="text-lg font-bold text-slate-700 dark:text-white"><i class="fa-solid fa-user-plus text-blue-500 mr-2"></i>ลงทะเบียนสมาชิกใหม่</h3>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">ชื่อผู้เรียกขาน (Display Name)</label>
+                    <input type="text" id="reg-name" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">อีเมล (Email)</label>
+                    <input type="email" id="reg-email" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">รหัสผ่าน (Password)</label>
+                    <input type="password" id="reg-password" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 dark:text-white">
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-blue500 to-purple-600 text-white font-bold py-3 rounded-xl hover:brightness-112 shadow-lg transition-all">CREATE IDENTITY</button>
+                <p class="text-xs text-center text-slate-500">มีบัญชีผู้ใช้ระบบแล้ว? <a href="#" onclick="switchAuthMode('login')" class="text-neoncyan font-bold hover:underline">กลับไปหน้าล็อกอิน</a></p>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- ================= MAIN SYSTEM APPARATUS (HIDDEN BEFORE AUTH) ================= -->
+    <div id="main-system" class="hidden">
+        <!-- NAVIGATION BAR -->
+        <nav class="sticky top-0 z-40 bg-white/80 dark:bg-cyberdark/80 backdrop-blur-md border-b border-slate-200 dark:border-cyan-500/30 px-6 py-4 flex justify-between items-center transition-all duration-300">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-r from-neoncyan to-blue500 p-2.5 rounded-xl border border-white/20 shadow-lg">
+                    <i class="fa-solid fa-bolt text-white text-xl animate-pulse"></i>
+                </div>
+                <div>
+                    <span class="font-neon font-black text-2xl tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-neoncyan to-blue500 glow-cyan">RUN_TRACKER //</span>
+                    <span class="text-xs block text-slate-500 dark:text-cyan-400/70 font-neon tracking-wider">USER: <span id="nav-username" class="text-white">Agent</span></span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button onclick="toggleTheme()" class="p-2.5 rounded-xl border border-slate-200 dark:border-cyan-500/30 text-slate-600 dark:text-neoncyan hover:bg-slate-100 dark:hover:bg-cyan-500/20">
+                    <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
+                </button>
+                <button onclick="openModal('run-modal')" class="bg-gradient-to-r from-neoncyan to-blue-500 text-white font-bold px-5 py-2.5 rounded-xl border border-cyan-400/30 hover:brightness-125 flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> บันทึกกิจกรรม
+                </button>
+                <button onclick="openModal('goal-modal')" class="border border-blue-500 text-slate-800 dark:text-white px-4 py-2.5 rounded-xl hover:bg-blue-500/20 font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-crosshair text-blue-500"></i> ตั้งเป้าหมาย
+                </button>
+                <button onclick="handleLogout()" class="text-slate-400 hover:text-red-500 px-2 py-1 text-sm font-bold transition-colors"><i class="fa-solid fa-power-off"></i></button>
+            </div>
+        </nav>
+
+        <!-- MAIN DASHBOARD CONTENT -->
+        <main class="max-w-7xl mx-auto p-6 space-y-8">
+            <!-- GOAL PROGRESS SECTION -->
+            <section class="bg-white dark:bg-cybercard p-6 rounded-2xl border border-slate-200 dark:border-cyan-500/20 shadow-xl relative overflow-hidden">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                    <div>
+                        <h2 class="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-slate-100">
+                            <i class="fa-solid fa-bullseye text-blue-500"></i> เป้าหมายระยะทางประจำเดือนนี้
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">ประจำช่วงเวลา: <span id="goal-period" class="font-neon text-neoncyan font-bold">N/A</span></p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-sm font-semibold text-slate-600 dark:text-slate-400">ความคืบหน้า:</span>
+                        <span id="goal-ratio" class="font-neon text-xl font-black ml-1 text-slate-800 dark:text-white">0.00 / 0.00 km</span>
+                    </div>
+                </div>
+                <div class="w-full bg-slate-100 dark:bg-slate-900 rounded-full h-5 p-1 border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <div id="goal-progress-bar" class="w-[0%] h-full rounded-full bg-blue-500 transition-all duration-1000 ease-out"></div>
+                </div>
+                <div class="flex justify-between items-center mt-3">
+                    <span id="goal-percentage" class="font-neon text-sm font-bold text-blue-500">0%</span>
+                    <span id="goal-congratulations" class="text-xs font-bold text-green-500 hidden animate-bounce">
+                        <i class="fa-solid fa-trophy mr-1"></i> ยินดีด้วย! คุณทำทะลุเป้าหมายเรียบร้อยแล้ว!
+                    </span>
+                </div>
+            </section>
+
+            <!-- CARD NUMERICAL SUMMARY -->
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white dark:bg-cybercard p-6 rounded-2xl border border-slate-200 dark:border-cyan-500/20 shadow-xl relative group overflow-hidden">
+                    <div class="flex justify-between items-start relative z-10">
+                        <div>
+                            <p class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Distance</p>
+                            <h3 id="dash-distance" class="font-neon text-4xl font-black mt-2 bg-clip-text text-transparent bg-gradient-to-r from-neoncyan to-blue-500 glow-cyan">0.00</h3>
+                        </div>
+                        <span class="bg-cyan-500/10 dark:bg-neoncyan/20 text-cyan-600 dark:text-neoncyan font-bold text-xs px-2.5 py-1 rounded-md border border-cyan-400/20">KM</span>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-cybercard p-6 rounded-2xl border border-slate-200 dark:border-cyan-500/20 shadow-xl relative group overflow-hidden">
+                    <div class="flex justify-between items-start relative z-10">
+                        <div>
+                            <p class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Average Pace</p>
+                            <h3 id="dash-pace" class="font-neon text-4xl font-black mt-2 bg-clip-text text-transparent bg-gradient-to-r from-blue500 to-purple-500 glow-pink">0'00"</h3>
+                        </div>
+                        <span class="bg-pink-500/10 dark:bg-blue-500/20 text-pink-600 dark:text-blue-500 font-bold text-xs px-2.5 py-1 rounded-md border border-pink-400/20">/KM</span>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-cybercard p-6 rounded-2xl border border-slate-200 dark:border-cyan-500/20 shadow-xl relative group overflow-hidden">
+                    <div class="flex justify-between items-start relative z-10">
+                        <div>
+                            <p class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Run Count</p>
+                            <h3 id="dash-count" class="font-neon text-4xl font-black mt-2 text-slate-800 dark:text-white">0</h3>
+                        </div>
+                        <span class="bg-amber-500/10 dark:bg-neonyellow/20 text-amber-600 dark:text-neonyellow font-bold text-xs px-2.5 py-1 rounded-md border border-amber-400/20">TIMES</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ACTIVITY HISTORY TIMELINE -->
+            <section class="space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-4">
+                    <h2 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-neoncyan"></i> ประวัติการวิ่งส่วนบุคคล</h2>
+                </div>
+                <div id="history-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ================= DIALOG MODAL LAYERS ================= -->
+    <!-- 1. ADD RUN MODAL -->
+    <div id="run-modal" class="fixed inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+        <div onclick="closeModal('run-modal')" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div class="bg-white dark:bg-cybercard w-full max-w-lg p-6 rounded-2xl border border-slate-200 dark:border-cyan-500/40 shadow-2xl relative z-10 transform translate-y-8 transition-all duration-300">
+            <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <h3 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-person-running text-neoncyan"></i> บันทึกกิจกรรมการวิ่งใหม่</h3>
+                <button onclick="closeModal('run-modal')" class="text-slate-400 hover:text-blue-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form id="run-form" onsubmit="handleRunSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1.5">วันที่ออกวิ่ง</label>
+                    <input type="date" required id="run-date" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-sm dark:text-white">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1.5">ระยะทาง (กิโลเมตร)</label>
+                        <input type="number" step="0.01" required id="run-distance" placeholder="5.5" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-sm dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1.5">เวลาที่ใช้ (ชั่วโมง:นาที:วินาที)</label>
+                        <input type="text" required id="run-duration" placeholder="00:30:00" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-sm font-neon dark:text-white">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1.5">ความรู้สึกหลังวิ่ง</label>
+                    <select id="run-feeling" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-sm dark:text-white">
+                        <option value="😊 สดชื่นกระปรี้กระเปร่า">😊 สดชื่นกระปรี้กระเปร่า</option>
+                        <option value="🥵 เหนื่อยสุดๆ แต่สะใจ">🥵 เหนื่อยสุดๆ แต่สะใจ</option>
+                        <option value="💪 สตรองมาก พลังเหลือ">💪 สตรองมาก พลังเหลือ</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1.5">อัปโหลดภาพถ่ายหลักฐาน (ส่งเข้า Google Drive)</label>
+                    <div class="relative border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-4 text-center">
+                        <input type="file" id="run-file" accept="image/*" onchange="processFileToBase64(this)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                        <i id="upload-icon" class="fa-solid fa-cloud-arrow-up text-3xl text-slate-400"></i>
+                        <p id="upload-text" class="text-xs text-slate-500 mt-1">คลิกเลือกรูปภาพหลักฐาน</p>
+                    </div>
+                    <input type="hidden" id="run-base64"><input type="hidden" id="run-filename">
+                </div>
+                <div class="pt-4 flex justify-end gap-3">
+                    <button type="button" onclick="closeModal('run-modal')" class="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-sm">ยกเลิก</button>
+                    <button type="submit" id="run-submit-btn" class="bg-gradient-to-r from-neoncyan to-blue-500 text-white font-bold px-6 py-2.5 rounded-xl">บันทึกข้อมูล</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. ADD GOAL MODAL -->
+    <div id="goal-modal" class="fixed inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+        <div onclick="closeModal('goal-modal')" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div class="bg-white dark:bg-cybercard w-full max-w-md p-6 rounded-2xl border border-slate-200 dark:border-blue-500/40 shadow-2xl relative z-10 transform translate-y-8 transition-all duration-300">
+            <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <h3 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-crosshair text-blue-500"></i> ตั้งเป้าหมายใหม่</h3>
+                <button onclick="closeModal('goal-modal')" class="text-slate-400 hover:text-blue-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form id="goal-form" onsubmit="handleGoalSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1.5">ช่วงเวลาเป้าหมาย (Period)</label>
+                    <input type="month" required id="goal-form-period" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-sm font-neon dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1.5">ระยะทางเป้าหมายรวม (กิโลเมตร)</label>
+                    <input type="number" step="0.1" required id="goal-form-target" placeholder="50" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-sm dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1.5">สถานะเป้าหมาย</label>
+                    <select id="goal-form-status" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-sm dark:text-white">
+                        <option value="Active">Active (เปิดใช้งานตอนนี้)</option>
+                        <option value="Inactive">Inactive (ตั้งค่าล่วงหน้า)</option>
+                    </select>
+                </div>
+                <div class="pt-4 flex justify-end gap-3">
+                    <button type="button" onclick="closeModal('goal-modal')" class="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-sm">ยกเลิก</button>
+                    <button type="submit" id="goal-submit-btn" class="bg-gradient-to-r from-blue500 to-purple-600 text-white font-bold px-6 py-2.5 rounded-xl">ตั้งค่าเป้าหมาย</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= JAVASCRIPT CORE OPERATIONS ================= -->
+    <script>
+        // ⚠️ วาง URL เว็บแอป (Apps Script API) ของคุณตรงนี้
+        const API_URL = "https://script.google.com/macros/s/AKfycbwOABKIeBKR2rA8UJSqcnYpIaM2HxywPk9Js1D1_ICd4XBoeuZbN883xOpgZbpzpopXiA/exec"; 
+
+        let currentUser = null;
+
+        // เช็ค Session การ Login เดิมเมื่อเปิดหน้าเว็บ
+        window.onload = function() {
+            const savedUser = localStorage.getItem('run_tracker_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showSystemDashboard();
+            }
+        };
+
+        function switchAuthMode(mode) {
+            if(mode === 'reg') {
+                document.getElementById('login-form').classList.add('hidden');
+                document.getElementById('register-form').classList.remove('hidden');
+            } else {
+                document.getElementById('register-form').classList.add('hidden');
+                document.getElementById('login-form').classList.remove('hidden');
+            }
+        }
+
+        // --- AUTH API HANDLERS ---
+        async function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            const res = await callApi({ action: "login", email: email, password: password });
+            if(res && res.success) {
+                currentUser = res.user;
+                localStorage.setItem('run_tracker_user', JSON.stringify(currentUser));
+                showSystemDashboard();
+                document.getElementById('login-form').reset();
+            } else {
+                alert(res ? res.message : "การเชื่อมต่อระบบขัดข้อง");
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+
+            const res = await callApi({ action: "register", name: name, email: email, password: password });
+            if(res && res.success) {
+                alert("ลงทะเบียนสำเร็จแล้ว! ระบบกำลังพากลับไปหน้าเข้าสู่ระบบ");
+                document.getElementById('register-form').reset();
+                switchAuthMode('login');
+            } else {
+                alert(res ? res.message : "ไม่สามารถลงทะเบียนได้");
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('run_tracker_user');
+            currentUser = null;
+            document.getElementById('main-system').classList.add('hidden');
+            document.getElementById('auth-container').classList.remove('hidden');
+        }
+
+        function showSystemDashboard() {
+            document.getElementById('auth-container').classList.add('hidden');
+            document.getElementById('main-system').classList.remove('hidden');
+            document.getElementById('nav-username').innerText = currentUser.name;
+            fetchDashboardData();
+        }
+
+        // --- CORE APPLICATION SYNC ---
+        async function fetchDashboardData() {
+            if (!currentUser) return;
+            const res = await callApi({ action: "getAllData", userEmail: currentUser.email });
+            if (res && res.success) {
+                renderDashboard(res.data.runs);
+                const activeGoal = res.data.goals.find(g => g.Status === "Active") || { TargetDistance: 0, Period: "ไม่มีเป้าหมายที่เปิดอยู่" };
+                renderProgressBar(res.data.runs, activeGoal);
+                renderHistoryGrid(res.data.runs);
+            }
+        }
+
+        async function handleRunSubmit(event) {
+            event.preventDefault();
+            const btn = document.getElementById('run-submit-btn');
+            btn.innerText = "PROCESSING..."; btn.disabled = true;
+
+            const payload = {
+                action: "addRun",
+                userEmail: currentUser.email,
+                date: document.getElementById('run-date').value,
+                distance: document.getElementById('run-distance').value,
+                duration: document.getElementById('run-duration').value,
+                feeling: document.getElementById('run-feeling').value,
+                imageBase64: document.getElementById('run-base64').value,
+                fileName: document.getElementById('run-filename').value
+            };
+
+            const res = await callApi(payload);
+            if(res && res.success) {
+                closeModal('run-modal');
+                fetchDashboardData();
+            } else {
+                alert("ล้มเหลว: " + res.message);
+            }
+            btn.innerText = "บันทึกข้อมูล"; btn.disabled = false;
+        }
+
+        async function handleGoalSubmit(event) {
+            event.preventDefault();
+            const btn = document.getElementById('goal-submit-btn');
+            btn.innerText = "SYNCING..."; btn.disabled = true;
+
+            const payload = {
+                action: "addGoal",
+                userEmail: currentUser.email,
+                period: document.getElementById('goal-form-period').value,
+                targetDistance: document.getElementById('goal-form-target').value,
+                status: document.getElementById('goal-form-status').value
+            };
+
+            const res = await callApi(payload);
+            if(res && res.success) {
+                closeModal('goal-modal');
+                fetchDashboardData();
+            }
+            btn.innerText = "ตั้งค่าเป้าหมาย"; btn.disabled = false;
+        }
+
+        // Global Fetch Wrapper (CORS Bypass Engine)
+        async function callApi(payload) {
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payload)
+                });
+                return await response.json();
+            } catch (err) {
+                console.error("Critical API Error: ", err);
+                return null;
+            }
+        }
+
+        // --- INTERFACE PRESENTATION ENGINE ---
+        function renderDashboard(runs) {
+            const totalDistance = runs.reduce((sum, r) => sum + parseFloat(r.Distance || 0), 0);
+            document.getElementById('dash-distance').innerText = totalDistance.toFixed(2);
+            document.getElementById('dash-count').innerText = runs.length;
+            
+            // นำค่า Pace ล่าสุดมาแสดงโชว์หน้าบอร์ดหลัก (ถ้ามีข้อมูล)
+            document.getElementById('dash-pace').innerText = runs.length > 0 ? runs[0].Pace : "0'00\"";
+        }
+
+        function renderProgressBar(runs, goal) {
+            const currentPeriodRuns = runs.filter(run => run.Date && run.Date.startsWith(goal.Period));
+            const activeDistance = currentPeriodRuns.reduce((sum, r) => sum + parseFloat(r.Distance || 0), 0);
+            
+            document.getElementById('goal-period').innerText = goal.Period;
+            document.getElementById('goal-ratio').innerText = `${activeDistance.toFixed(2)} / ${parseFloat(goal.TargetDistance || 0).toFixed(2)} km`;
+            
+            let percentage = goal.TargetDistance > 0 ? (activeDistance / goal.TargetDistance) * 100 : 0;
+            if (percentage > 100) percentage = 100;
+            
+            const progressBar = document.getElementById('goal-progress-bar');
+            const percentText = document.getElementById('goal-percentage');
+            const congratsMsg = document.getElementById('goal-congratulations');
+            
+            percentText.innerText = `${percentage.toFixed(0)}%`;
+            progressBar.style.width = `${percentage}%`;
+
+            progressBar.className = "h-full rounded-full transition-all duration-1000 ease-out";
+            percentText.className = "font-neon text-sm font-bold";
+
+            if (percentage < 50) {
+                progressBar.classList.add('bg-orange-500');
+                percentText.classList.add('text-orange-500');
+                congratsMsg.classList.add('hidden');
+            } else if (percentage >= 50 && percentage < 100) {
+                progressBar.classList.add('bg-blue-500');
+                percentText.classList.add('text-blue-500');
+                congratsMsg.classList.add('hidden');
+            } else if (percentage >= 100) {
+                progressBar.classList.add('bg-green-500');
+                percentText.classList.add('text-green-500');
+                congratsMsg.classList.remove('hidden');
+            }
+        }
+
+        function renderHistoryGrid(runs) {
+            const container = document.getElementById('history-grid');
+            container.innerHTML = "";
+            if (runs.length === 0) {
+                container.innerHTML = `<div class="col-span-3 text-center py-12 text-slate-400">ยังไม่พบบันทึกกิจกรรมการวิ่งของคุณในขณะนี้</div>`;
+                return;
+            }
+            runs.forEach(run => {
+                const card = document.createElement('div');
+                card.className = "bg-white dark:bg-cybercard rounded-2xl p-5 border border-slate-200 dark:border-slate-800/80 hover:border-neoncyan/50 shadow-md transition-all flex flex-col justify-between";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="font-neon text-xs font-bold text-slate-400 bg-slate-50 dark:bg-slate-900 px-2.5 py-1 rounded-md">${run.RunID}</span>
+                            <span class="text-xs text-slate-500 flex items-center gap-1"><i class="fa-regular fa-calendar text-blue-500"></i> ${run.Date.split('T')[0]}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 my-4 bg-slate-50 dark:bg-slate-950/50 p-3 rounded-xl border">
+                            <div class="text-center">
+                                <span class="text-[10px] block font-bold text-slate-400 uppercase">Distance</span>
+                                <span class="font-neon text-xl font-extrabold text-slate-800 dark:text-white">${parseFloat(run.Distance).toFixed(2)} km</span>
+                            </div>
+                            <div class="text-center border-l">
+                                <span class="text-[10px] block font-bold text-slate-400 uppercase">Duration</span>
+                                <span class="font-neon text-xl font-extrabold text-slate-800 dark:text-white">${run.Duration}</span>
+                            </div>
+                        </div>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between"><span class="text-slate-400 text-xs">Pace เฉลี่ย:</span><span class="font-neon font-bold text-neoncyan">${run.Pace}</span></div>
+                            <div class="flex justify-between"><span class="text-slate-400 text-xs">ความรู้สึก:</span><span class="font-medium text-slate-300">${run.Feeling}</span></div>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-900 flex justify-between items-center">
+                        ${run.FileURL ? `<a href="${run.FileURL}" target="_blank" class="text-xs text-slate-500 hover:text-neoncyan flex items-center gap-1.5"><i class="fa-solid fa-image"></i> ดูภาพใน Drive</a>` : `<span class="text-xs text-slate-600">ไม่มีหลักฐานแนบ</span>`}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // UI Utility Switches
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.className = "fa-solid fa-sun text-lg text-amber-500";
+            } else {
+                html.classList.add('dark');
+                icon.className = "fa-solid fa-moon text-lg";
+            }
+        }
+        function openModal(id) {
+            const m = document.getElementById(id);
+            m.classList.remove('opacity-0', 'pointer-events-none');
+            m.firstElementChild.nextElementSibling.classList.remove('translate-y-8');
+        }
+        function closeModal(id) {
+            const m = document.getElementById(id);
+            m.classList.add('opacity-0', 'pointer-events-none');
+            m.firstElementChild.nextElementSibling.classList.add('translate-y-8');
+            if(id === 'run-modal') document.getElementById('run-form').reset();
+        }
+        function processFileToBase64(el) {
+            const file = el.files[0]; if (!file) return;
+            const r = new FileReader();
+            r.onload = function(e) {
+                document.getElementById('run-base64').value = e.target.result.split(',')[1];
+                document.getElementById('run-filename').value = file.name;
+                document.getElementById('upload-icon').className = "fa-solid fa-circle-check text-3xl text-green-500";
+                document.getElementById('upload-text').innerText = `พร้อมส่ง: ${file.name}`;
+            };
+            r.readAsDataURL(file);
+        }
+    </script>
+</body>
+</html>
